@@ -89,22 +89,21 @@ input[type=text],select{width:100%;background:#2a1209;color:var(--ink);border:1p
 #wishDlg .box{width:100%;max-width:380px;background:#2a1209;border:1px solid var(--gold);border-radius:18px;padding:16px;text-align:center}
 #wishDlg h3{margin:0 0 10px;font-family:"Noto Serif",serif;color:var(--gold)}
 /* chant */
-#chant{position:fixed;left:8px;right:8px;bottom:calc(env(safe-area-inset-bottom) + 92px);z-index:6;display:none;justify-content:center}
-.chantBox{width:100%;max-width:420px;background:rgba(30,11,5,.92);border:1px solid var(--gold);border-radius:20px;padding:12px;display:flex;flex-direction:column;align-items:center;gap:6px;box-shadow:0 10px 40px #000a}
-#chantText{font-family:"Noto Serif",serif;font-weight:700;font-size:21px;color:#ffe08a;text-align:center;text-shadow:0 0 14px #ff9a40;line-height:1.3}
-#chantText.pulse{animation:cp .6s}
-@keyframes cp{0%{transform:scale(1.12);color:#fff}100%{transform:scale(1)}}
-.chantHint{font-size:12px;opacity:.7;text-align:center}
-#phrases{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+#chant{position:fixed;left:0;right:0;bottom:0;z-index:6;display:none;flex-direction:column;align-items:center;padding:0 8px calc(env(safe-area-inset-bottom) + 10px);background:linear-gradient(#160a0500,#160a05f2 35%)}
+#chant.show{display:flex}
+body.chanting #templeBar{display:none}
+.chantBar{width:100%;max-width:440px;display:flex;flex-direction:column;gap:6px;align-items:center}
+#chantPhraseBtn{border:1px solid var(--gold);background:rgba(40,16,6,.85);color:#ffe08a;border-radius:999px;padding:6px 14px;font-family:"Noto Serif",serif;font-weight:700;font-size:15px;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cbRow{display:flex;gap:6px;width:100%;justify-content:center}
+.cbRow .act{max-width:120px}
+#chantTap{flex:2;max-width:200px}
+#chantTap.pulse{animation:cp .4s}
+@keyframes cp{0%{transform:scale(.9)}100%{transform:scale(1)}}
+#phrases{display:none;flex-wrap:wrap;gap:6px;justify-content:center;max-width:440px;margin-bottom:8px;background:rgba(30,11,5,.92);border:1px solid var(--line);border-radius:16px;padding:10px}
+#phrases.show{display:flex}
 #phrases .chipb.on{background:linear-gradient(#f4cf72,#c8902e);color:#3a1505;border-color:var(--gold)}
 .float.chantf{background:rgba(40,16,6,.82);border:1px solid #f0c35a88;padding:5px 12px;border-radius:14px;font-family:"Noto Serif",serif;font-size:14px;color:#ffe08a}
 #chant.show{display:flex}
-#beads{position:relative;width:150px;height:150px}
-#beads i{position:absolute;width:7px;height:7px;margin:-3.5px;border-radius:50%;background:#5a3a22}
-#beads i.on{background:var(--gold);box-shadow:0 0 6px #ffb35a}
-#chantTap{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:96px;height:96px;border-radius:50%;border:2px solid var(--gold);background:radial-gradient(#8a2a12,#3a0e05);color:var(--ink);font-weight:700;font-size:13px}
-#chantTap:active{transform:translate(-50%,-50%) scale(.93)}
-#chantReset{font-size:11px;padding:4px 10px}
 /* board */
 #board{position:fixed;top:calc(env(safe-area-inset-top) + 92px);right:10px;width:240px;z-index:7;background:rgba(30,11,5,.94);border:1px solid var(--gold);border-radius:16px;padding:12px;display:none}
 #board.show{display:block}
@@ -204,13 +203,14 @@ body.altar #navBtn{}
 </div>
 
 <div id="chant">
-  <div class="chantBox">
-    <div id="chantText">Nam Mô A Di Đà Phật</div>
-    <div class="chantHint" data-i="chantHint"></div>
-    <div id="beads"><button id="chantTap"><span id="chantN">0 / 108</span></button></div>
-    <div class="chantHint" data-i="choosePhrase"></div>
-    <div id="phrases"></div>
-    <div class="row" style="justify-content:center;margin-top:6px"><button class="btn ghost" id="chantReset">↺ 0</button><button class="btn ghost" id="chantClose">✕</button></div>
+  <div id="phrases"></div>
+  <div class="chantBar">
+    <button id="chantPhraseBtn"><span id="chantText">Nam Mô A Di Đà Phật</span> ▾</button>
+    <div class="cbRow">
+      <button id="chantTap" class="act main"><i>📿</i><span id="chantN">0 / 108</span></button>
+      <button id="chantVoice" class="act"><i>🔊</i><span data-i="voice">Đọc to</span></button>
+      <button id="chantClose" class="act"><i>✕</i><span data-i="done2">Xong</span></button>
+    </div>
   </div>
 </div>
 
@@ -510,7 +510,7 @@ if (typeof module !== 'undefined') module.exports = { solar2lunar, lunar2solar }
       wishTitle: 'Lời nguyện (không bắt buộc)', wishPh: 'Ví dụ: Cầu cho gia đình bình an', ok: 'Dâng hương', cancel: 'Thôi',
       online: 'người đang ở chùa', alone: 'Chỉ có bạn — mời người thân cùng vào nhé', merit: 'Công đức', board: 'Bảng vàng công đức', boardShort: 'Bảng vàng',
       boardEmpty: 'Chưa có ai — hãy là người đầu tiên', tapHint: 'Chạm xuống sàn để đi • kéo ngang để xoay',
-      chantDone: 'Viên mãn 108 biến 🙏', chantHint: 'Chạm vào chuỗi hạt để niệm — mỗi lần chạm là một câu', choosePhrase: 'Chọn câu niệm:', namo: 'Nam mô A Di Đà Phật',
+      chantDone: 'Viên mãn 108 biến 🙏', chantHint: 'Chạm vào chuỗi hạt để niệm — mỗi lần chạm là một câu', choosePhrase: 'Chọn câu niệm:', chantTapL: 'Niệm', voice: 'Đọc to', done2: 'Xong', namo: 'Nam mô A Di Đà Phật',
       litBy: 'vừa thắp hương', moBy: 'đang gõ mõ', bellBy: 'vừa thỉnh chuông', bowBy: 'đang lạy Phật',
       ancestors: 'Ông bà tổ tiên', addAnc: '+ Thêm người thân', ancName: 'Tên (VD: Bà nội)', ancYears: 'Năm sinh – năm mất', ancGio: 'Ngày giỗ (âm lịch)',
       day: 'Ngày', month: 'Tháng', photo: 'Chọn ảnh', save: 'Lưu', del: 'Xoá', edit: 'Sửa bàn thờ', done: 'Xong',
@@ -532,7 +532,7 @@ if (typeof module !== 'undefined') module.exports = { solar2lunar, lunar2solar }
       wishTitle: 'Your prayer (optional)', wishPh: 'e.g. Peace for my family', ok: 'Offer incense', cancel: 'Cancel',
       online: 'people here', alone: 'Just you — invite your family to join', merit: 'Merit', board: 'Merit board', boardShort: 'Merit',
       boardEmpty: 'No one yet — be the first', tapHint: 'Tap the floor to walk • drag sideways to turn',
-      chantDone: '108 recitations complete 🙏', chantHint: 'Tap the beads to chant — one phrase per tap', choosePhrase: 'Choose a phrase:', namo: 'Namo Amitabha Buddha',
+      chantDone: '108 recitations complete 🙏', chantHint: 'Tap the beads to chant — one phrase per tap', choosePhrase: 'Choose a phrase:', chantTapL: 'Chant', voice: 'Voice', done2: 'Done', namo: 'Namo Amitabha Buddha',
       litBy: 'lit incense', moBy: 'is striking the wooden fish', bellBy: 'rang the bell', bowBy: 'is bowing',
       ancestors: 'Ancestors', addAnc: '+ Add a loved one', ancName: 'Name (e.g. Grandma)', ancYears: 'Years (birth – passing)', ancGio: 'Memorial day (lunar)',
       day: 'Day', month: 'Month', photo: 'Choose photo', save: 'Save', del: 'Delete', edit: 'Edit altar', done: 'Done',
@@ -2091,7 +2091,8 @@ if (typeof module !== 'undefined') module.exports = { solar2lunar, lunar2solar }
       const ly = hy - hr - fs * 1.2;
       c.fillStyle = 'rgba(40,16,6,.62)'; rr(c, X - tw / 2, ly - fs * 0.85, tw, fs * 1.6, fs * 0.8); c.fill();
       c.fillStyle = av.isMe ? '#ffe08a' : '#fff6dc'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(txt, X, ly);
-    }
+      drawBubble(c, av, X, ly - fs);
+    } else drawBubble(c, av, X, hy - hr - 4);
   }
 
   // ---------- hiệu ứng ----------
@@ -2266,10 +2267,47 @@ if (typeof module !== 'undefined') module.exports = { solar2lunar, lunar2solar }
   }
   function onActButton(a) {
     if (a === 'h' || a === 'wish' || a === 'hd') { openWish(a); return; }
-    if (a === 'n') { $('chant').classList.toggle('show'); return; }
+    if (a === 'n') { openChant(); return; }
     act(a);
   }
   PW.renderSceneBar = renderSceneBar; PW.renderSceneNav = renderSceneNav;
+  PW.say = function (av, text, kind, dur) { if (!av) return; av.bubble = { text: String(text).slice(0, 120), kind: kind || 'chat', until: performance.now() + (dur || 6000), born: performance.now() }; };
+  function wrapLines(c, text, maxW) { const words = text.split(' '); const lines = []; let cur = ''; words.forEach(w => { const tt = cur ? cur + ' ' + w : w; if (c.measureText(tt).width > maxW && cur) { lines.push(cur); cur = w; } else cur = tt; }); if (cur) lines.push(cur); return lines.slice(0, 4); }
+  function drawBubble(c, av, X, topY) {
+    const b = av.bubble; if (!b) return; const now = performance.now(); if (now > b.until) { av.bubble = null; return; }
+    const age = (now - b.born) / 1000, left = (b.until - now) / 1000; const alpha = Math.min(1, age * 6, left * 2);
+    const chant = b.kind === 'chant'; const fs = chant ? 15 : 13.5;
+    c.save(); c.globalAlpha = alpha;
+    c.font = `${chant ? '700' : '500'} ${fs}px ${chant ? '"Noto Serif", Georgia, serif' : '"Be Vietnam Pro", system-ui, sans-serif'}`;
+    const lines = wrapLines(c, b.text, Math.min(200, PW.W * 0.55)); const lw = Math.max(...lines.map(l => c.measureText(l).width));
+    const pad = 9, w = lw + pad * 2, h = lines.length * (fs + 4) + pad * 1.4;
+    const pop = Math.min(1, age * 5); const y = topY - h - 10 - (1 - pop) * 8;
+    let x = X - w / 2; x = Math.max(6, Math.min(PW.W - w - 6, x));
+    if (chant) { const g = c.createLinearGradient(0, y, 0, y + h); g.addColorStop(0, '#fff1c2'); g.addColorStop(1, '#f2c55a'); c.fillStyle = g; c.shadowColor = 'rgba(255,190,80,.9)'; c.shadowBlur = 14; }
+    else { c.fillStyle = 'rgba(255,252,245,.96)'; c.shadowColor = 'rgba(0,0,0,.35)'; c.shadowBlur = 8; }
+    rr(c, x, y, w, h, 12); c.fill(); c.shadowBlur = 0;
+    c.beginPath(); c.moveTo(X - 7, y + h - 1); c.lineTo(X, y + h + 9); c.lineTo(X + 7, y + h - 1); c.closePath(); c.fill();
+    if (chant) { c.strokeStyle = '#b8832a'; c.lineWidth = 1.5; rr(c, x, y, w, h, 12); c.stroke(); }
+    c.fillStyle = chant ? '#5a2208' : '#2a1608'; c.textAlign = 'center'; c.textBaseline = 'top';
+    lines.forEach((l, i) => c.fillText(l, x + w / 2, y + pad * 0.7 + i * (fs + 4)));
+    c.restore();
+  }
+  // đọc to câu niệm (giọng đọc có sẵn trong máy)
+  let viVoice = null, ttsOn = store.get('csl_tts', true);
+  function pickVoice() { try { const vs = speechSynthesis.getVoices(); viVoice = vs.find(v => /^vi/i.test(v.lang)) || null; } catch (e) {} }
+  try { if (window.speechSynthesis) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; } } catch (e) {}
+  function speakChant(text, vol) {
+    if (!ttsOn || !soundOn || !window.speechSynthesis) return;
+    try {
+      if (vol < 1 && speechSynthesis.speaking) return;
+      speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text.replace(/^🙏\s*/, ''));
+      u.lang = lang === 'vi' ? 'vi-VN' : 'en-US'; if (lang === 'vi' && viVoice) u.voice = viVoice;
+      u.rate = 0.72; u.pitch = 0.75; u.volume = vol;
+      speechSynthesis.speak(u);
+    } catch (e) {}
+  }
+  PW.speakChant = speakChant;
 
   // hành động trong tranh
   PW.act = function (a, wish) {
@@ -2303,7 +2341,7 @@ if (typeof module !== 'undefined') module.exports = { solar2lunar, lunar2solar }
     else if (a === 'm') { if (here) { playMo(0.35); floatText(av, '🪵'); } }
     else if (a === 'c') { playBell(here ? 0.45 : 0.2); }
     else if (a === 'l') { if (here) pwStartBow(av, 3); }
-    else if (a === 'n') { if (here) floatText(av, '🙏 ' + (w || t('namo')), 'chantf'); }
+    else if (a === 'n') { if (here) { PW.say(av, '🙏 ' + (w || t('namo')), 'chant', 3500); speakChant(w || t('namo'), 0.35); } }
     else if (a === 'd') { sys(`✅ ${name} ${t('didCheckIn')}`); }
   };
 
@@ -2342,7 +2380,7 @@ if (typeof module !== 'undefined') module.exports = { solar2lunar, lunar2solar }
     if (mode === 'temple') {
       if (a === 'm') { if (now - lastMo < 220) return; lastMo = now; playMo(1); floatText(me, '🪵 +1'); addMerit(1); }
       else if (a === 'c') { playBell(1); floatText(me, '🔔 +3'); addMerit(3); }
-      else if (a === 'n') { floatText(me, '🙏 ' + chantPhrase(), 'chantf'); addMerit(1); wish = chantPhrase(); }
+      else if (a === 'n') { PW.say(me, '🙏 ' + chantPhrase(), 'chant', 3500); speakChant(chantPhrase(), 1); addMerit(1); wish = chantPhrase(); }
       else PW.act(a, wish);
     } else {
       if (a === 'h') { A.burner.add(3); playChime(0.6); addMerit(5); if (wish) toast('🙏 ' + wish); }
@@ -2360,11 +2398,10 @@ if (typeof module !== 'undefined') module.exports = { solar2lunar, lunar2solar }
   // nút
   $('chantTap').onclick = () => {
     chantCount++; act('n'); playMo(0.5); renderChant();
-    const ct = $('chantText'); ct.classList.remove('pulse'); void ct.offsetWidth; ct.classList.add('pulse');
+    const ct = $('chantTap'); ct.classList.remove('pulse'); void ct.offsetWidth; ct.classList.add('pulse');
     if (chantCount % 108 === 0) { toast('🪷 ' + t('chantDone')); playBell(0.8); addMerit(20); }
   };
-  $('chantReset').onclick = () => { chantCount = 0; renderChant(); };
-  $('chantClose').onclick = () => $('chant').classList.remove('show');
+  $('chantClose').onclick = () => openChant(false);
   const PHRASES = [
     { vi: 'Nam Mô A Di Đà Phật', en: 'Namo Amitabha Buddha' },
     { vi: 'Nam Mô Bổn Sư Thích Ca Mâu Ni Phật', en: 'Namo Shakyamuni Buddha' },
@@ -2376,17 +2413,17 @@ if (typeof module !== 'undefined') module.exports = { solar2lunar, lunar2solar }
   function chantPhrase() { return PHRASES[phraseI][lang] || PHRASES[phraseI].vi; }
   function renderPhrases() {
     const box = $('phrases'); if (!box) return; box.innerHTML = '';
-    PHRASES.forEach((p, i) => { const b = document.createElement('button'); b.className = 'chipb' + (i === phraseI ? ' on' : ''); b.textContent = p[lang] || p.vi; b.onclick = () => { phraseI = i; store.set('csl_phrase', i); chantCount = 0; renderChant(); renderPhrases(); }; box.appendChild(b); });
+    PHRASES.forEach((p, i) => { const b = document.createElement('button'); b.className = 'chipb' + (i === phraseI ? ' on' : ''); b.textContent = p[lang] || p.vi; b.onclick = () => { phraseI = i; store.set('csl_phrase', i); chantCount = 0; renderChant(); renderPhrases(); $('phrases').classList.remove('show'); }; box.appendChild(b); });
     $('chantText').textContent = chantPhrase();
   }
   function renderChant() {
     const k = chantCount % 108 || (chantCount ? 108 : 0);
     $('chantN').textContent = k + ' / 108';
-    const beads = $('beads'); if (!beads.children.length) {
-      for (let i = 0; i < 108; i++) { const b = document.createElement('i'); const a = i / 108 * Math.PI * 2 - Math.PI / 2; b.style.left = (50 + Math.cos(a) * 44) + '%'; b.style.top = (50 + Math.sin(a) * 44) + '%'; beads.appendChild(b); }
-    }
-    [...beads.children].forEach((b, i) => b.classList.toggle('on', i < k));
+    $('chantVoice').querySelector('i').textContent = ttsOn ? '🔊' : '🔇';
   }
+  $('chantVoice').onclick = () => { ttsOn = !ttsOn; store.set('csl_tts', ttsOn); renderChant(); if (ttsOn) speakChant(chantPhrase(), 1); };
+  $('chantPhraseBtn').onclick = () => $('phrases').classList.toggle('show');
+  function openChant(on) { const show = on === undefined ? !$('chant').classList.contains('show') : on; $('chant').classList.toggle('show', show); document.body.classList.toggle('chanting', show); $('phrases').classList.remove('show'); }
   renderChant(); renderPhrases();
 
   // lời nguyện
@@ -2655,7 +2692,7 @@ if (typeof module !== 'undefined') module.exports = { solar2lunar, lunar2solar }
     const now = Date.now(); if (now - C.lastSend < 1500) { toast(t('slowDown')); return; } C.lastSend = now;
     lastChat = { m: text, mt: now }; pushPresence(true);
     addMsg({ key: 'me-' + now, n: myName, t: text, ts: now, me: true });
-    if (mode === 'temple') floatText(me.root, '💬 ' + text, 'wish');
+    if (mode === 'temple') PW.say(me, text, 'chat', 7000);
     C.myChat = C.myChat.concat([{ t: text, ts: now }]).slice(-12); store.set('csl_chat', C.myChat);
     if (db && myId && C.dbOk !== false) { try { await db.doc('chat/' + myId).set({ n: myName, list: C.myChat, ts: now }); C.dbOk = true; } catch (e) { C.dbOk = false; } }
   }
@@ -2664,7 +2701,7 @@ if (typeof module !== 'undefined') module.exports = { solar2lunar, lunar2solar }
     const key = (pr.id || peerKey) + '-' + pr.mt; if (C.seen.has(key)) return;
     if (Date.now() - pr.mt > 120000) { C.seen.add(key); return; }
     const txt = clean(pr.m, 120); addMsg({ key, n: name, t: txt, ts: Math.min(Date.now(), +pr.mt) });
-    if (av && mode === 'temple' && av.root.visible) floatText(av.root, '💬 ' + txt, 'wish');
+    if (av) PW.say(av, txt, 'chat', 7000);
   }
 
   // ---- điểm danh ----
